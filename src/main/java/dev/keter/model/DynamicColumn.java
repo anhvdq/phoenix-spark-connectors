@@ -38,7 +38,7 @@ public class DynamicColumn {
 
     public static DynamicColumn fromString(String info) {
         String[] split = info.split("::");
-        return new DynamicColumn(split[0].toUpperCase(), split[1].toUpperCase());
+        return new DynamicColumn(split[0].trim().toUpperCase(), split[1].trim().toUpperCase());
     }
 
     public ColumnInfo toPhoenixColumnInfo() {
