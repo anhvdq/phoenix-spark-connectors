@@ -46,7 +46,8 @@ class FilterExpressionCompiler {
           val (whereLeftClause, leftUnsupportedFilters, _) = pushFilters(Array(leftFilter))
           val (whereRightClause, rightUnsupportedFilters, _) = pushFilters(Array(rightFilter))
           if (leftUnsupportedFilters.isEmpty && rightUnsupportedFilters.isEmpty) {
-            filter.append(whereLeftClause + " OR " + whereRightClause)
+            val (finalLeft, finalRight) = (handleQuote(leftFilter, whereLeftClause), handleQuote(rightFilter, whereRightClause))
+            filter.append("(" + finalLeft + " OR " + finalRight + ")")
           }
           else {
             unsupportedFilters :+ f
@@ -55,7 +56,7 @@ class FilterExpressionCompiler {
         case Not(aFilter) => {
           val (whereClause, currUnsupportedFilters, _) = pushFilters(Array(aFilter))
           if (currUnsupportedFilters.isEmpty)
-            filter.append(" NOT " + whereClause)
+            filter.append(s" NOT ($whereClause)")
           else
             unsupportedFilters :+ f
         }
@@ -112,5 +113,13 @@ class FilterExpressionCompiler {
 
   private def isClass(obj: Any, className: String) = {
     className.equals(obj.getClass().getName())
+  }
+
+  private def handleQuote(filter: Filter, whereClause: String): String = {
+    filter match {
+      case Or(_, _) => whereClause.substring(1, whereClause.length - 1)
+      case And(_, _) => s"($whereClause)"
+      case _ => whereClause
+    }
   }
 }
