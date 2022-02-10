@@ -47,6 +47,6 @@ public class DynamicColumn {
 
     @Override
     public String toString() {
-        return columnName + " " + dataType;
+        return "\"" + columnName + "\" " + dataType;
     }
 }
