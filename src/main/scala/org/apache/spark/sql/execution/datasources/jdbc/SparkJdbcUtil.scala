@@ -151,7 +151,9 @@ object SparkJdbcUtil {
         case ArrayType(_, _) =>
           throw new IllegalArgumentException("Nested arrays unsupported")
 
-        case _ => (array: Object) => array.asInstanceOf[Array[Any]]
+        // Use this instead of array.asInstanceOf[Array[Any]]
+        // because java array of primitives cannot cast to array of objects
+        case _ => (array: Object) => array.asInstanceOf[Any]
       }
 
       (rs: ResultSet, row: InternalRow, pos: Int) =>
@@ -163,12 +165,11 @@ object SparkJdbcUtil {
     case _ => throw new IllegalArgumentException(s"Unsupported type ${dt.catalogString}")
   }
 
-  // TODO just use JdbcUtils.resultSetToSparkInternalRows in Spark 3.0 (see SPARK-26499)
   def resultSetToSparkInternalRows(
                                     resultSet: ResultSet,
                                     schema: StructType,
                                     inputMetrics: InputMetrics): Iterator[InternalRow] = {
-    // JdbcUtils.resultSetToSparkInternalRows(resultSet, schema, inputMetrics)
+
     new NextIterator[InternalRow] {
       private[this] val rs = resultSet
       private[this] val getters: Array[JDBCValueGetter] = makeGetters(schema)
