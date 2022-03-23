@@ -46,6 +46,8 @@ public class PhoenixDataSource implements TableProvider, DataSourceRegister {
     public static final String PHOENIX_CONFIGS = "phoenixConfigs";
     public static final String DYNAMIC_COLUMNS = "dynamicColumns";
     public static final String DYNAMIC_COLUMNS_SEPARATOR = ",";
+    public static final String SKIP_NORMALIZING_IDENTIFIER = "skipNormalizingIdentifier";
+    public static final String UPSERT_DYNAMIC_COLUMNS = "upsertDynamicColumns";
 
     @Override
     public StructType inferSchema(CaseInsensitiveStringMap options) {

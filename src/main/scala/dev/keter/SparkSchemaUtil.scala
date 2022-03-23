@@ -1,22 +1,9 @@
 package dev.keter
 
 import org.apache.phoenix.query.QueryConstants
-import org.apache.phoenix.schema.types.{
-  PBinary, PBinaryArray, PBoolean, PBooleanArray, PChar,
-  PCharArray, PDate, PDateArray, PDecimal, PDecimalArray, PDouble, PDoubleArray, PFloat, PFloatArray,
-  PInteger, PIntegerArray, PLong, PLongArray, PSmallint, PSmallintArray, PTime, PTimeArray,
-  PTimestamp, PTimestampArray, PTinyint, PTinyintArray, PUnsignedDate, PUnsignedDateArray,
-  PUnsignedDouble, PUnsignedDoubleArray, PUnsignedFloat, PUnsignedFloatArray, PUnsignedInt,
-  PUnsignedIntArray, PUnsignedLong, PUnsignedLongArray, PUnsignedSmallint, PUnsignedSmallintArray,
-  PUnsignedTime, PUnsignedTimeArray, PUnsignedTimestamp, PUnsignedTimestampArray, PUnsignedTinyint,
-  PUnsignedTinyintArray, PVarbinary, PVarbinaryArray, PVarchar, PVarcharArray
-}
+import org.apache.phoenix.schema.types._
 import org.apache.phoenix.util.{ColumnInfo, SchemaUtil}
-import org.apache.spark.sql.types.{
-  ArrayType, BinaryType, BooleanType, ByteType, DataType, DateType,
-  DecimalType, DoubleType, FloatType, IntegerType, LongType, ShortType, StringType, StructField,
-  StructType, TimestampType
-}
+import org.apache.spark.sql.types._
 
 object SparkSchemaUtil {
 
@@ -74,5 +61,32 @@ object SparkSchemaUtil {
     case t if t.isInstanceOf[PTimestampArray] || t.isInstanceOf[PUnsignedTimestampArray] => ArrayType(TimestampType, containsNull = true)
     case t if t.isInstanceOf[PDateArray] || t.isInstanceOf[PUnsignedDateArray] => ArrayType(TimestampType, containsNull = true)
     case t if t.isInstanceOf[PTimeArray] || t.isInstanceOf[PUnsignedTimeArray] => ArrayType(TimestampType, containsNull = true)
+  }
+
+  def catalystTypeToPhoenixType(dataType: DataType): PDataType[_] = dataType match {
+    case StringType => PVarchar.INSTANCE
+    case LongType => PLong.INSTANCE
+    case IntegerType => PInteger.INSTANCE
+    case ShortType=> PSmallint.INSTANCE
+    case ByteType => PTinyint.INSTANCE
+    case FloatType => PFloat.INSTANCE
+    case DoubleType => PDouble.INSTANCE
+    case DecimalType() => PDecimal.INSTANCE
+    case TimestampType => PTimestamp.INSTANCE
+    case DateType => PDate.INSTANCE
+    case BooleanType => PBoolean.INSTANCE
+    case BinaryType => PVarbinary.INSTANCE
+    case ArrayType(IntegerType, _) => PIntegerArray.INSTANCE
+    case ArrayType(BooleanType, _) => PBooleanArray.INSTANCE
+    case ArrayType(StringType, _) => PVarcharArray.INSTANCE
+    case ArrayType(BinaryType, _) => PVarbinaryArray.INSTANCE
+    case ArrayType(LongType, _) => PLongArray.INSTANCE
+    case ArrayType(ShortType, _) => PSmallintArray.INSTANCE
+    case ArrayType(ByteType, _) => PTinyintArray.INSTANCE
+    case ArrayType(FloatType, _) => PFloatArray.INSTANCE
+    case ArrayType(DoubleType, _) => PDoubleArray.INSTANCE
+    case ArrayType(DecimalType(), _) => PDecimalArray.INSTANCE
+    case ArrayType(TimestampType, _) => PTimestampArray.INSTANCE
+    case ArrayType(DateType, _) => PDateArray.INSTANCE
   }
 }

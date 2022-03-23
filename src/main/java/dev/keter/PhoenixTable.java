@@ -14,8 +14,9 @@
 
 package dev.keter;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import dev.keter.reader.PhoenixScanBuilder;
+import dev.keter.writer.PhoenixWriteBuilder;
 import org.apache.spark.sql.connector.catalog.SupportsRead;
 import org.apache.spark.sql.connector.catalog.SupportsWrite;
 import org.apache.spark.sql.connector.catalog.Table;
@@ -31,6 +32,11 @@ import java.util.Set;
 public class PhoenixTable implements Table, SupportsRead, SupportsWrite {
     private final String tableName;
     private final StructType schema;
+    private static final Set<TableCapability> CAPABILITIES = ImmutableSet.of(
+            TableCapability.BATCH_READ,
+            TableCapability.BATCH_WRITE,
+            TableCapability.ACCEPT_ANY_SCHEMA
+    );
 
     public PhoenixTable(String tableName, StructType schema) {
         this.tableName = tableName;
@@ -49,7 +55,7 @@ public class PhoenixTable implements Table, SupportsRead, SupportsWrite {
 
     @Override
     public Set<TableCapability> capabilities() {
-        return Sets.newHashSet(TableCapability.BATCH_READ, TableCapability.BATCH_WRITE);
+        return CAPABILITIES;
     }
 
     @Override
@@ -59,6 +65,6 @@ public class PhoenixTable implements Table, SupportsRead, SupportsWrite {
 
     @Override
     public WriteBuilder newWriteBuilder(LogicalWriteInfo logicalWriteInfo) {
-        return null;
+        return new PhoenixWriteBuilder(logicalWriteInfo.schema(), logicalWriteInfo.options());
     }
 }
